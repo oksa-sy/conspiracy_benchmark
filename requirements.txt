@@ -12,4 +12,6 @@ ruff
 scikit-learn
 tqdm
 typer
+pyyaml
+datasets
 -e .

@@ -1,0 +1,10 @@
+directories:
+  import_dir: "import"
+  input_dir: "input"
+  output_dir: "output"
+  models_dir: "models"
+
+datasets:
+  - name: "voat"
+  - name: "semeval"
+  - name: "ccn"
