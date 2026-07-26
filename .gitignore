@@ -4,6 +4,9 @@ import/
 input/
 output/
 
+#VSCode
+.vscode/
+
 # Mac OS-specific storage files
 .DS_Store
 
