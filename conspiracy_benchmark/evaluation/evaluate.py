@@ -7,9 +7,6 @@ from sklearn.metrics import classification_report, accuracy_score
 
 app = typer.Typer()
 
-# datasets
-datasets = ["voat", "semeval", "ccn"]
-
 @app.command()
 def matrix(model_name: str):
     # evaluation of predictions made by the models
@@ -19,6 +16,8 @@ def matrix(model_name: str):
     with open(config_path, "r", encoding="utf-8") as file:
         config = yaml.safe_load(file)
     output_dir = Path(config["directories"]["output_dir"])
+    # extracting datasets list from yaml file
+    datasets = list(config["datasets"].keys())
     # lists to save the results
     visual_matrix_data = []
     detailed_metrics = []
@@ -30,9 +29,13 @@ def matrix(model_name: str):
             # in this way a upper trinagular matrix is bulit with the diagonal as the in-domain performance
             if j < i:
                 continue
+            # number of splits
+            # for now only one split, could be necessary to add more
+            splits = len(config["datasets"][test_ds]["splits"]["test"])
+            split = "1"
             # constructing file path to obtain the model's perfomance
             file_name = f"pred_{model_name}_train_{train_ds}.jsonl"
-            file_path = output_dir / test_ds / "splits" / "1" / file_name
+            file_path = output_dir / test_ds / "splits" / split / file_name
             if not file_path.exists():
                 logger.warning(f"missing file: {file_path}")
                 continue
@@ -76,12 +79,15 @@ def matrix(model_name: str):
 
     # saving the results and the matrix
     # saving the matrix as csv
-    matrix_file = output_dir / f"matrix_macro_f1_{model_name}.csv"
-    # filling the voids with "-" to preserve the triangular look
-    pivot_matrix.fillna("-").to_csv(matrix_file)
+    matrix_file = output_dir / f"matrix_{model_name}.csv"
+    # filling the voids with "-" to preserve the triangular look and manually inserting decimals to avoid it being read as text
+    matrix_csv = pivot_matrix.copy()
+    for col in matrix_csv.columns:
+        matrix_csv[col] = matrix_csv[col].apply(lambda x: f"{x:.3f}".replace('.', ',') if pd.notna(x) else "-")
+    matrix_csv.to_csv(matrix_file, sep=";")
     logger.success(f"triangular matrix saved to: {matrix_file}")
     # saving the report as json
-    report_file = output_dir / f"evaluation_full_report_{model_name}.json"
+    report_file = output_dir / f"evaluation_report_{model_name}.json"
     pd.DataFrame(detailed_metrics).to_json(report_file, orient="records", indent=4)
     logger.success(f"full detailed metrics saved to: {report_file}")
 

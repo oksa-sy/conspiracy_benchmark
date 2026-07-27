@@ -5,6 +5,20 @@ directories:
   models_dir: "models"
 
 datasets:
-  - name: "voat"
-  - name: "semeval"
-  - name: "ccn"
+  voat:
+    splits:
+      train: ["input/voat/splits/1/train.jsonl"]
+      val:   ["input/voat/splits/1/val.jsonl"]
+      test:  ["input/voat/splits/1/test.jsonl"]
+      
+  semeval:
+    splits:
+      train: ["input/semeval/splits/1/train.jsonl"]
+      val:   ["input/semeval/splits/1/val.jsonl"]
+      test:  ["input/semeval/splits/1/test.jsonl"]
+
+  ccn:
+    splits:
+      train: ["input/ccn/splits/1/train.jsonl"]
+      val:   ["input/ccn/splits/1/val.jsonl"]
+      test:  ["input/ccn/splits/1/test.jsonl"]

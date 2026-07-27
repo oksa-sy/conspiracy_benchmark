@@ -3,7 +3,6 @@ import yaml
 from loguru import logger
 import typer
 import pandas as pd
-import json
 from datasets import load_dataset, Dataset, Features, Value, ClassLabel, Sequence
 
 app = typer.Typer()
