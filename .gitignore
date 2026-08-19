@@ -1,10 +1,9 @@
 # Data
 /data/
-import/
-input/
-output/
+reports/predictions/*.jsonl
+config/platform_credentials.env
 
-#VSCode
+# VSCode
 .vscode/
 
 # Mac OS-specific storage files

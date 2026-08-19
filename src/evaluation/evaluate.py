@@ -1,9 +1,12 @@
 from pathlib import Path
-import yaml
 import pandas as pd
 from loguru import logger
 import typer
 from sklearn.metrics import classification_report, accuracy_score
+from src.dataset_modules import LOADER_REGISTRY
+import src.dataset_modules.voat_loader
+import src.dataset_modules.ccn_loader
+import src.dataset_modules.semeval_loader
 
 app = typer.Typer()
 
@@ -11,13 +14,12 @@ app = typer.Typer()
 def matrix(model_name: str):
     # evaluation of predictions made by the models
     logger.info(f"starting evaluation for model: {model_name.upper()}")
-    # reading paths dynamically
-    config_path = Path("experiment-config.yaml")
-    with open(config_path, "r", encoding="utf-8") as file:
-        config = yaml.safe_load(file)
-    output_dir = Path(config["directories"]["output_dir"])
-    # extracting datasets list from yaml file
-    datasets = list(config["datasets"].keys())
+    # defining paths for the output directory and predictions directory
+    output_dir = Path("reports/metrics")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    preds_dir = Path("reports/predictions")
+    # extracting datasets list from the LOADER_REGISTRY to ensure we evaluate all datasets that have been processed
+    datasets = list(LOADER_REGISTRY.keys())
     # lists to save the results
     visual_matrix_data = []
     detailed_metrics = []
@@ -28,22 +30,17 @@ def matrix(model_name: str):
             # skipping if the index of the column (test) is less than the index of the row (train) 
             # in this way a upper trinagular matrix is bulit with the diagonal as the in-domain performance
             if j < i:
-                continue
-            # number of splits
-            # for now only one split, could be necessary to add more
-            splits = len(config["datasets"][test_ds]["splits"]["test"])
-            split = "1"
+                continue      
             # constructing file path to obtain the model's perfomance
-            file_name = f"pred_{model_name}_train_{train_ds}.jsonl"
-            file_path = output_dir / test_ds / "splits" / split / file_name
+            file_name = f"pred_{model_name}_train_{train_ds}_test_{test_ds}.jsonl"
+            file_path = preds_dir / file_name
             if not file_path.exists():
                 logger.warning(f"missing file: {file_path}")
                 continue
             # reading the results
             df = pd.read_json(file_path, lines=True)
-            y_true = df["label"]
+            y_true = df["canonical_label"]
             y_pred = df["predicted_label"]
-            
             # calculating all the metrics (F1, acc, prec, rec per class)
             report = classification_report(y_true, y_pred, output_dict=True, zero_division=0)
             acc = accuracy_score(y_true, y_pred)
@@ -66,25 +63,25 @@ def matrix(model_name: str):
                 "class_metrics": {k: v for k, v in report.items() if k not in ["accuracy", "macro avg", "weighted avg"]}
             })
 
+    if not visual_matrix_data:
+        logger.error("no data has been processed, check the predictions folder.")
+        raise typer.Exit(1)
     # rendering the matrix in a 2D table for printing on the terminal
     df_matrix = pd.DataFrame(visual_matrix_data)
     pivot_matrix = df_matrix.pivot(index="Train", columns="Test", values="Macro_F1")
     # reordering the rows and columns to match the original order (pandas sorts alphabetically by default)
     labels_upper = [d.upper() for d in datasets]
-    pivot_matrix = pivot_matrix.reindex(index=labels_upper, columns=labels_upper)
+    # filtering the labels to only include those that are present in the pivot matrix, to avoid KeyError when reindexing
+    valid_labels = [l for l in labels_upper if l in pivot_matrix.columns or l in pivot_matrix.index]
+    pivot_matrix = pivot_matrix.reindex(index=valid_labels, columns=valid_labels)
     # printing the matrix
     print(f"\nUPPER TRIANGULAR MATRIX (Macro F1), model: {model_name.upper()}")
     # filling voids with "-" to preserve the look of the matrix 
     print(pivot_matrix.fillna("-").to_string())
-
     # saving the results and the matrix
     # saving the matrix as csv
     matrix_file = output_dir / f"matrix_{model_name}.csv"
-    # filling the voids with "-" to preserve the triangular look and manually inserting decimals to avoid it being read as text
-    matrix_csv = pivot_matrix.copy()
-    for col in matrix_csv.columns:
-        matrix_csv[col] = matrix_csv[col].apply(lambda x: f"{x:.3f}".replace('.', ',') if pd.notna(x) else "-")
-    matrix_csv.to_csv(matrix_file, sep=";")
+    pivot_matrix.fillna("-").to_csv(matrix_file)
     logger.success(f"triangular matrix saved to: {matrix_file}")
     # saving the report as json
     report_file = output_dir / f"evaluation_report_{model_name}.json"

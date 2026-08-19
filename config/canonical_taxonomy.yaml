@@ -1,0 +1,7 @@
+allowed_canonical_labels:
+  - conspiracy
+  - no_conspiracy
+  - cant_tell
+
+reserved_actions:
+  - EXCLUDE
