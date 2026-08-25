@@ -16,9 +16,9 @@ SOURCE_MAP = {
 }
 
 @app.command()
-def train(dataset: str):
+def train(dataset_experiment: str = typer.Argument(..., help="dataset to train on (ccn, voat, semeval) or 'loo' for leave-one-out strategy"), loo: bool = typer.Option(False, "--loo", help="trains on the entire file, ignoring the filters")):
     # training and testing of a baseline in and cross domain
-    logger.info(f"starting baseline. Traing dataset: {dataset.upper()}")
+    logger.info(f"starting baseline. Traing dataset: {dataset_experiment.upper()}")
     # defining paths for training and testing data, as well as output directory
     train_path = Path("data/03_benchmark/benchmark_train.jsonl")
     test_path = Path("data/03_benchmark/benchmark_test.jsonl")
@@ -27,8 +27,8 @@ def train(dataset: str):
     # all datasets
     datasets = list(SOURCE_MAP.keys())
     # check to see if the input dataset is in the list
-    if dataset not in datasets:
-        logger.error(f"Dataset {dataset} not found")
+    if not loo and dataset_experiment not in datasets:
+        logger.error(f"dataset {dataset_experiment} not found")
         raise typer.Exit(code=1)
     # loading training data
     logger.info(f"loading training data from {train_path}...")
@@ -37,11 +37,15 @@ def train(dataset: str):
     except FileNotFoundError:
         logger.error(f"file not found: {train_path}")
         raise typer.Exit(code=1)
+    if loo:
+        logger.info(f"training on all data for strategy: leave-one-out")
+        df_train = df_all_train
     # filtering the training data to only include rows corresponding to the specified dataset
-    target_source = SOURCE_MAP.get(dataset.lower())
-    df_train = df_all_train[df_all_train['metadata'].apply(lambda x: isinstance(x, dict) and x.get('source') == target_source)]
+    else:
+        target_source = SOURCE_MAP.get(dataset_experiment.lower())
+        df_train = df_all_train[df_all_train['metadata'].apply(lambda x: isinstance(x, dict) and x.get('source') == target_source)]
     if df_train.empty:
-        logger.error(f"no training data found for source {target_source}")
+        logger.error(f"no training data found for experiment: {dataset_experiment}")
         raise typer.Exit(code=1)
     # isolating the text and labels from the data
     X_train_text= df_train["text"]
@@ -87,7 +91,7 @@ def train(dataset: str):
         # making the predictions
         predictions_svm = model.predict(X_test_vectors)
         # saving the results memorizing test and training datasets
-        output_file_svm = f"pred_baseline_train_{dataset}_test_{test_dataset}.jsonl"
+        output_file_svm = f"pred_baseline_train_{dataset_experiment}_test_{test_dataset}.jsonl"
         output_path_svm = output_dir / output_file_svm
         # saving id, label and predicted_label
         df_test["predicted_label"] = predictions_svm
@@ -96,13 +100,13 @@ def train(dataset: str):
 
         # RANDOM BASELINE
         dummy_predictions = dummy_model.predict(X_test_text)
-        file_dummy = f"pred_random_train_{dataset}_test_{test_dataset}.jsonl"
+        file_dummy = f"pred_random_train_{dataset_experiment}_test_{test_dataset}.jsonl"
         output_path_dummy = output_dir / file_dummy
         df_test["predicted_label"] = dummy_predictions
         df_test[["original_id", "canonical_label", "predicted_label"]].to_json(output_path_dummy, orient="records", lines=True)
         logger.success(f"   saved DUMMY: {output_path_dummy}")
 
-    logger.success(f"completed on training datasets: {dataset.upper()}")
+    logger.success(f"completed on training datasets: {dataset_experiment.upper()}")
 
 if __name__ == "__main__":
     app()

@@ -1,4 +1,9 @@
 from pathlib import Path
+import sys
+# adding the project root to sys.path to ensure that src can be imported
+project_root = str(Path(__file__).parent.parent.parent)
+if project_root not in sys.path:
+    sys.path.append(project_root)
 import pandas as pd
 from loguru import logger
 import typer
