@@ -14,4 +14,5 @@ tqdm
 typer
 pyyaml
 datasets
--e .
+torch
+transformers
