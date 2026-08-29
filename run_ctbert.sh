@@ -31,3 +31,15 @@ python src/modeling/transformer.py semeval
 # ccn
 echo "starting training process for CT-BERT model on the CCN dataset..."
 python src/modeling/transformer.py ccn
+
+# loco
+echo "starting training process for CT-BERT model on the LOCO dataset..."
+python src/modeling/transformer.py loco
+
+# coco
+echo "starting training process for CT-BERT model on the COCO dataset..."
+python src/modeling/transformer.py coco
+
+# donald
+echo "starting training process for CT-BERT model on the DONALD dataset..."
+python src/modeling/transformer.py donald
