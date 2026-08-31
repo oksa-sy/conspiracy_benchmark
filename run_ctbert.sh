@@ -2,7 +2,7 @@
 #SBATCH --job-name=ctbert_train
 #SBATCH --output=%x_%j.log
 #SBATCH --error=%x_%j.err
-#SBATCH --time=0-12:00:00
+#SBATCH --time=2-00:00:00
 #SBATCH -n 8
 #SBATCH -N 1
 #SBATCH --mem-per-cpu=4G
