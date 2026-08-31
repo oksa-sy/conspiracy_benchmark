@@ -1,4 +1,5 @@
 import json
+import random
 from pathlib import Path
 from typing import Generator, Dict, Any
 from .base_loader import BaseDatasetLoader
@@ -36,6 +37,12 @@ class LocoLoader(BaseDatasetLoader):
         # reading the LOCO dataset and yielding each record with harmonized fields
         with open(p / "data/LOCO.json", 'r', encoding='utf-8') as f:
             data = json.load(f)
+            # limiting the number of records to 10,000 for performance reasons
+            MAX_ROWS = 10000
+            if len(data) > MAX_ROWS:
+                # setting a random seed for reproducibility
+                random.seed(42)
+                data = random.sample(data, MAX_ROWS)
             for example in data:
                 themes = []
                 # the three LDA topic keys in the dataset

@@ -25,8 +25,8 @@ echo "starting training process for CT-BERT model on the VOAT dataset..."
 python src/modeling/transformer.py voat
 
 # semeval
-echo "starting training process for CT-BERT model on the Semeval dataset..."
-python src/modeling/transformer.py semeval
+# echo "starting training process for CT-BERT model on the Semeval dataset..."
+# python src/modeling/transformer.py semeval
 
 # ccn
 echo "starting training process for CT-BERT model on the CCN dataset..."

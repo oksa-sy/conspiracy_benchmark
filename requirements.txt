@@ -16,3 +16,4 @@ pyyaml
 datasets
 torch
 transformers
+pyreadr
