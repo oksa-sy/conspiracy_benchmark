@@ -43,8 +43,8 @@ class DonaldLoader(BaseDatasetLoader):
             p / "dataverse_files/DONALD.txt.LL.rdata",
             p / "dataverse_files/DONALD.txt.RR.rdata"
         ]
-         # setting a maximum of 10000 rows for each file to have an equal split and not overload memory
-        MAX_ROWS = 10000
+         # setting a maximum of 5000 rows for each file to have an equal split and not overload memory
+        MAX_ROWS = 5000
          # iterating over the 4 files in the dataset
         for file in files:
             try:
@@ -53,7 +53,7 @@ class DonaldLoader(BaseDatasetLoader):
                 # pyreadr returns a dictionary, grabbing the first key dynamically because the R object name changes per file
                 key = list(result.keys())[0]
                 df_texts = result[key]
-                # randomly collecting 10000 rows
+                # randomly collecting 5000 rows
                 if len(df_texts) > MAX_ROWS:
                     # undersample the dataset, random_state=42 ensures the exact same sample every time
                     df_texts = df_texts.sample(n=MAX_ROWS, random_state=42)
