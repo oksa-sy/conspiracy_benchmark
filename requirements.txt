@@ -17,3 +17,4 @@ datasets
 torch
 transformers
 pyreadr
+accelerate

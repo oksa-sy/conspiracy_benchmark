@@ -1,0 +1,7 @@
+[
+  {"id": "test_ccn_01", "text": "Primo testo fittizio per ccn", "category": "CRITICAL", "annotations": [], "spacy_tokens": ""},
+  {"id": "test_ccn_02", "text": "Secondo testo fittizio per ccn", "category": "CRITICAL", "annotations": [], "spacy_tokens": ""},
+  {"id": "test_ccn_03", "text": "Terzo testo fittizio per ccn", "category": "CRITICAL", "annotations": [], "spacy_tokens": ""},
+  {"id": "test_ccn_04", "text": "Quarto testo fittizio per ccn", "category": "CRITICAL", "annotations": [], "spacy_tokens": ""},
+  {"id": "test_ccn_05", "text": "Quinto testo fittizio per ccn", "category": "CRITICAL", "annotations": [], "spacy_tokens": ""}
+]

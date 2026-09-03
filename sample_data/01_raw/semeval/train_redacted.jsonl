@@ -1,1 +1,10 @@
-{"_id":"t1_train001","conspiracy":"Yes","markers":[{"startIndex":0,"endIndex":4,"type":"Threat","text":"this"}]}
+{"_id":"t1_tr01","conspiracy":"Yes","markers":[]}
+{"_id":"t1_tr02","conspiracy":"No","markers":[]}
+{"_id":"t1_tr03","conspiracy":"Yes","markers":[]}
+{"_id":"t1_tr04","conspiracy":"No","markers":[]}
+{"_id":"t1_tr05","conspiracy":"Yes","markers":[]}
+{"_id":"t1_tr06","conspiracy":"No","markers":[]}
+{"_id":"t1_tr07","conspiracy":"Yes","markers":[]}
+{"_id":"t1_tr08","conspiracy":"No","markers":[]}
+{"_id":"t1_tr09","conspiracy":"Yes","markers":[]}
+{"_id":"t1_tr10","conspiracy":"No","markers":[]}
