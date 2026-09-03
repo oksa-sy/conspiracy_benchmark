@@ -12,7 +12,7 @@ app = typer.Typer()
 SOURCE_MAP = {
     "ccn": "XAI-DisInfodemics",
     "voat": "Voat",
-    # "semeval": "SemEval",
+    "semeval": "SemEval",
     "loco": "LOCO",
     "coco": "COCO",
     "donald": "DONALD"
