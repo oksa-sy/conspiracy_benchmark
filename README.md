@@ -68,7 +68,7 @@ To prepare the environment and set up the mock data on the cluster, run the foll
 
 ```bash
 # 1. Clone the repository and setup the environment
-git clone [https://github.com/oksa-sy/conspiracy_benchmark](https://github.com/oksa-sy/conspiracy_benchmark)
+git clone https://github.com/oksa-sy/conspiracy_benchmark
 cd conspiracy_benchmark
 module load python/3.10.8_10gcc
 python -m venv venv
@@ -102,7 +102,7 @@ If you don't have access to the HPC cluster, you can easily test the pipeline on
 
 **1. Setup the local environment:**
 ```bash
-git clone [https://github.com/oksa-sy/conspiracy_benchmark](https://github.com/oksa-sy/conspiracy_benchmark)
+git clone https://github.com/oksa-sy/conspiracy_benchmark
 cd conspiracy_benchmark
 python3 -m venv venv
 source venv/bin/activate
