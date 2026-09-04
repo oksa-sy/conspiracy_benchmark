@@ -1,1 +1,10 @@
-{"_id":"t1_test001","text":"Test test normal one","conspiracy":"No","markers":[]}
+{"_id": "t1_te00", "text": "Test text 0", "conspiracy": "Yes", "markers": []}
+{"_id": "t1_te01", "text": "Test text 1", "conspiracy": "No", "markers": []}
+{"_id": "t1_te02", "text": "Test text 2", "conspiracy": "Yes", "markers": []}
+{"_id": "t1_te03", "text": "Test text 3", "conspiracy": "No", "markers": []}
+{"_id": "t1_te04", "text": "Test text 4", "conspiracy": "Yes", "markers": []}
+{"_id": "t1_te05", "text": "Test text 5", "conspiracy": "No", "markers": []}
+{"_id": "t1_te06", "text": "Test text 6", "conspiracy": "Yes", "markers": []}
+{"_id": "t1_te07", "text": "Test text 7", "conspiracy": "No", "markers": []}
+{"_id": "t1_te08", "text": "Test text 8", "conspiracy": "Yes", "markers": []}
+{"_id": "t1_te09", "text": "Test text 9", "conspiracy": "No", "markers": []}
