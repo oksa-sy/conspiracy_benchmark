@@ -8,7 +8,9 @@
 
 # loading necessary modules and activating the virtual environment
 module load python/3.10.8_10gcc
-cd /lustre/home/smirra/conspiracy_benchmark
+
+# moving to the submission directory (user-independent)
+cd $SLURM_SUBMIT_DIR
 source venv/bin/activate
 
 # execution of the build script
