@@ -16,6 +16,7 @@ import src.dataset_modules.semeval_loader
 import src.dataset_modules.coco_loader
 import src.dataset_modules.loco_loader
 import src.dataset_modules.donald_loader
+import src.dataset_modules.twitter_loader
 from src.harmonizer import HarmonizerValidator
 
 app = typer.Typer()

@@ -12,6 +12,10 @@ from src.dataset_modules import LOADER_REGISTRY
 import src.dataset_modules.voat_loader
 import src.dataset_modules.ccn_loader
 import src.dataset_modules.semeval_loader
+import src.dataset_modules.coco_loader
+import src.dataset_modules.loco_loader
+import src.dataset_modules.donald_loader
+import src.dataset_modules.twitter_loader
 
 app = typer.Typer()
 

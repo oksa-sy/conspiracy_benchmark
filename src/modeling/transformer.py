@@ -15,7 +15,8 @@ SOURCE_MAP = {
     "semeval": "SemEval",
     "loco": "LOCO",
     "coco": "COCO",
-    "donald": "DONALD"
+    "donald": "DONALD",
+    "twitter_conspiracy": "Twitter_Conspiracy"
 }
 
 # mapping between textual labels and numerical IDs for the Transformer model
