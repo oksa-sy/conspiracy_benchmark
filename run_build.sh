@@ -3,14 +3,24 @@
 #SBATCH --output=build_%j.log
 #SBATCH --error=build_%j.err
 #SBATCH --time=0-01:00:00
-#SBATCH --mem=32G
-#SBATCH --partition=dss
 
-# loading necessary modules and activating the virtual environment
-module load python/3.10.8_10gcc
+# ==========================================
+# CLUSTER-SPECIFIC SETTINGS (MODIFY THESE!)
+# ==========================================
+# 1. Set your partition (e.g., compute, standard)
+# #SBATCH --partition=YOUR_PARTITION_NAME
+#
+# 2. Hardware requests (RAM is critical for large datasets)
+#SBATCH --mem=32G
+# ==========================================
+
+# Load your specific python module here (if required by your HPC)
+# module load python/3.x.x
 
 # moving to the submission directory (user-independent)
 cd $SLURM_SUBMIT_DIR
+
+# activating the virtual environment
 source venv/bin/activate
 
 # execution of the build script

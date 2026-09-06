@@ -33,7 +33,8 @@ conspiracy-benchmark/
 │   │   ├── base_loader.py       # abstract base class (strategy pattern)
 │   │   ├── ccn_loader.py        
 │   │   ├── coco_loader.py       
-│   │   ├── donald_loader.py     
+│   │   ├── donald_loader.py 
+|   |   ├── twitter_loader.py    
 │   │   ├── loco_loader.py       
 │   │   ├── semeval_loader.py    
 │   │   └── voat_loader.py
@@ -76,8 +77,8 @@ First, clone the repository, prepare your virtual environment, and load the mock
 git clone https://github.com/oksa-sy/conspiracy_benchmark
 cd conspiracy_benchmark
 
-# If you are on the HPC cluster, load the Python module first:
-# module load python/3.10.8_10gcc
+# If you are on an HPC cluster, load your specific Python 3.8+ module first.
+# Example: module load python/3.10
 
 python3 -m venv venv
 source venv/bin/activate
@@ -112,18 +113,29 @@ python scripts/04_build_benchmark.py --split-strategy stratified_re_split
 ```
 
 **HPC Cluster Execution (Slurm):**
-If you are running the pipeline on the cluster, use the `sbatch` command. 
-> **Note:** The bash script `run_build.sh` is pre-configured with a default splitting strategy. If you want to change it, open the `run_build.sh` file and modify the Python arguments inside before submitting the job.
+If you are running the pipeline on the university cluster, use the `sbatch` command. 
+> **IMPORTANT FOR HPC USERS:** The `run_build.sh` script is provided as a universal template. Before submitting the job, you **must** open the file and modify the cluster-specific `#SBATCH` directives (such as `--partition` and `--mem`) and the `module load` command to match your infrastructure. You can also modify the default Python splitting strategy inside.
 
 ```bash
 sbatch run_build.sh
 ```
 
-### Step 4: Model Training (CT-BERT)
-Once the datasets are built, you can launch the transformer fine-tuning.
+### Step 4: Model Training
 
-**Local Execution:**
+Once the datasets are built, you can launch the transformer fine-tuning. You can choose to train classical machine learning baselines (SVM and Random Classifier) or fine-tune the CT-BERT transformer. The baseline script trains both an SVM (using TF-IDF features) and a stratified Random dummy classifier, automatically generating in-domain and cross-domain predictions.
+
 Pass the target dataset name (e.g., `semeval`, `voat`, `ccn`) as a positional argument. If you are running a LOO experiment, pass `loo` as the argument and add the `--loo` flag.
+
+**1. Baselines (SVM & Random Classifier):**
+```bash
+# Standard baseline training on a specific dataset
+python src/modeling/baseline.py semeval
+
+# Leave-One-Out (LOO) baseline training
+python src/modeling/baseline.py loo --loo
+```
+
+**2. Transformer (CT-BERT):**
 ```bash
 # Standard training
 python src/modeling/transformer.py semeval
@@ -134,6 +146,20 @@ python src/modeling/transformer.py loo --loo
 
 **HPC Cluster Execution (Slurm):**
 Modify the dataset arguments directly inside `run_ctbert.sh` if necessary, then launch the training job:
+> **IMPORTANT FOR HPC USERS:** Similar to the build script, `run_ctbert.sh` is a template. You **must** open the file to configure your cluster's specific `#SBATCH` directives before execution. Since this is a Transformer fine-tuning task, ensure you allocate a GPU partition (e.g., `#SBATCH --gpus=1`) or sufficient CPU cores if GPUs are unavailable on your system. Modify the dataset arguments inside if necessary.
 ```bash
 sbatch run_ctbert.sh
 ```
+
+### Step 5: Evaluation & Metrics
+Once the models have generated the predictions (saved in reports/predictions/), you can evaluate them to compute the cross-domain generalization scores.  Run the evaluation script by passing the exact name of the model you want to evaluate (e.g., random, baseline, or your transformer identifier).  
+
+```bash
+# Generate the evaluation matrix for the Random Baseline
+python src/evaluation/evaluate.py random
+
+# Generate the evaluation matrix for the SVM Baseline
+python src/evaluation/evaluate.py baseline
+```
+
+The script will render the upper triangular Macro-F1 matrix directly in your terminal and save the detailed evaluation reports (including accuracy, precision, recall, and per-class metrics) in the reports/metrics/ directory.
