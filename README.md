@@ -106,6 +106,9 @@ python scripts/04_build_benchmark.py --split-strategy preserve_original_splits
 
 # Example 2: Building with Leave-One-Out (LOO) strategy
 python scripts/04_build_benchmark.py --split-strategy leave_one_dataset_out --target-dataset semeval
+
+# Example 3: Building with a stratified 80/10/10 re-split
+python scripts/04_build_benchmark.py --split-strategy stratified_re_split
 ```
 
 **HPC Cluster Execution (Slurm):**

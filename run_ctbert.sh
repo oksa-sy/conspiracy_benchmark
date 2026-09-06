@@ -6,11 +6,11 @@
 #SBATCH --partition=AMD
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem=64G
-#SBATCH --array=0-6
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=32G
+#SBATCH --array=0-6%1
 ## set the email address for notifications
-#SBATCH --mail-user=your-email@example.com
+#SBATCH --mail-user=your.email@example.com
 #SBATCH --mail-type=END,FAIL
 
 # loading necessary modules
