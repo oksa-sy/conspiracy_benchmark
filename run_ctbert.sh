@@ -3,13 +3,14 @@
 #SBATCH --output=%x_%A_%a.log
 #SBATCH --error=%x_%A_%a.err
 #SBATCH --time=2-00:00:00
-#SBATCH -n 8
-#SBATCH -N 1
-#SBATCH --mem-per-cpu=4G
-#SBATCH --partition=dss
-#SBATCH --array=0-4
+#SBATCH --partition=AMD
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=64G
+#SBATCH --array=0-6
 ## set the email address for notifications
-#SBATCH --mail-user=your.email@example.it
+#SBATCH --mail-user=your-email@example.com
 #SBATCH --mail-type=END,FAIL
 
 # loading necessary modules
@@ -21,12 +22,15 @@ cd $SLURM_SUBMIT_DIR
 # activating the virtual environment
 source venv/bin/activate
 
-# defining the list of target datasets (Semeval is currently excluded)
-DATASETS=("voat" "ccn" "semeval" "loco" "coco" "donald")
+# defining the list of target datasets 
+DATASETS=("voat" "ccn" "semeval" "loco" "coco" "donald" "twitter_conspiracy")
 
 # extracting the target dataset based on the SLURM array index (0 to 4)
 TARGET_DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
+# setting the number of threads for parallel processing
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
 # starting the training process
-echo "starting training process for CT-BERT model on the $TARGET_DATASET dataset..."
+echo "starting training process for CT-BERT model on the $TARGET_DATASET dataset using $SLURM_CPUS_PER_TASK core CPU (AMD EPYC)..."
 python src/modeling/transformer.py $TARGET_DATASET
