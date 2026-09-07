@@ -35,11 +35,7 @@ def matrix(model_name: str):
     # creating the upper triangular matrix w/ train splits as rows, test splits as columns for all datasets, 
     # the diagonal is the in-domain performance, the off-diagonal is the cross-domain performance
     for i, train_ds in enumerate(datasets):
-        for j, test_ds in enumerate(datasets):
-            # skipping if the index of the column (test) is less than the index of the row (train) 
-            # in this way a upper trinagular matrix is bulit with the diagonal as the in-domain performance
-            if j < i:
-                continue      
+        for j, test_ds in enumerate(datasets):    
             # constructing file path to obtain the model's perfomance
             file_name = f"pred_{model_name}_train_{train_ds}_test_{test_ds}.jsonl"
             file_path = preds_dir / file_name
@@ -84,13 +80,12 @@ def matrix(model_name: str):
     valid_labels = [l for l in labels_upper if l in pivot_matrix.columns or l in pivot_matrix.index]
     pivot_matrix = pivot_matrix.reindex(index=valid_labels, columns=valid_labels)
     # printing the matrix
-    print(f"\nUPPER TRIANGULAR MATRIX (Macro F1), model: {model_name.upper()}")
-    # filling voids with "-" to preserve the look of the matrix 
-    print(pivot_matrix.fillna("-").to_string())
+    print(f"\nMATRIX (Macro F1), model: {model_name.upper()}")
+    print(pivot_matrix.to_string())
     # saving the results and the matrix
     # saving the matrix as csv
     matrix_file = output_dir / f"matrix_{model_name}.csv"
-    pivot_matrix.fillna("-").to_csv(matrix_file)
+    pivot_matrix.to_csv(matrix_file)
     logger.success(f"triangular matrix saved to: {matrix_file}")
     # saving the report as json
     report_file = output_dir / f"evaluation_report_{model_name}.json"
