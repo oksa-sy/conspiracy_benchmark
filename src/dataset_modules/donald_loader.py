@@ -1,3 +1,5 @@
+import os
+from loguru import logger
 import pandas as pd
 import pyreadr
 from pathlib import Path
@@ -13,7 +15,19 @@ class DonaldLoader(BaseDatasetLoader):
     }
 
     def acquire(self) -> None:
-        pass
+        if self.check_readiness():
+            logger.info("DONALD dataset already present, skipping acquisition.")
+            return
+        # create the raw directory if it doesn't exist
+        raw_path = Path(self.raw_dir)
+        os.makedirs(raw_path, exist_ok=True)
+        logger.error(
+            f"a request for access is required\n"
+            f"go to the Harvard Dataverse page: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/VDQL8A\n"
+            f"click on 'Request Access' and complete the request.\n"
+            f"once you have the files, place them in: {os.path.abspath(raw_path)}\n"
+            f"then rerun the script.\n"
+        )
 
     def check_readiness(self) -> bool:
         p = Path(self.raw_dir)

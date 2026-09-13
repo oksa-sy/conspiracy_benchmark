@@ -1,6 +1,11 @@
+import os
+import subprocess
+import zipfile
+from loguru import logger
 import pandas as pd
 from pathlib import Path
 from typing import Generator, Dict, Any
+import requests
 from .base_loader import BaseDatasetLoader
 from . import register_loader
 
@@ -11,9 +16,79 @@ class SemevalLoader(BaseDatasetLoader):
         "No": "no_conspiracy",
         "Can't tell": "cant_tell"
     }
-
     def acquire(self) -> None:
-        pass
+            if self.check_readiness():
+                logger.info("SemEval dataset already rehydrated. Skipping acquisition.")
+                return
+            raw_path = Path(self.raw_dir)
+            os.makedirs(raw_path, exist_ok=True)
+            # rehydration script
+            script_path = raw_path / "rehydrate_data.py"
+            # downloading the starter pack from GitHub and extracting it
+            logger.info("downloading SemEval from GitHub")
+            # url of the GitHub repository
+            zip_url = "https://github.com/hide-ous/semeval26_task10_starter_pack/archive/refs/heads/main.zip"
+            response = requests.get(zip_url)
+            if response.status_code == 200:
+                zip_path = raw_path / "github_repo.zip"
+                with open(zip_path, 'wb') as f:
+                    f.write(response.content)
+                # extracting the zip file
+                logger.info("extracting the GitHub zip file")
+                with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+                    zip_ref.extractall(raw_path)
+                # moving the contents of the extracted folder to the raw_dir
+                extracted_folder = raw_path / "semeval26_task10_starter_pack-main"
+                if extracted_folder.exists():
+                    for item in extracted_folder.iterdir():
+                        item.rename(raw_path / item.name)
+                    extracted_folder.rmdir()
+                # removing the zip file after extraction
+                zip_path.unlink()
+                logger.success("SemEval files downloaded and extracted successfully.")
+            else:
+                logger.error(f"failed to download SemEval from GitHub with status code: {response.status_code}")
+                return
+            # downloading the redacted and filtered test files from Zenodo
+            zenodo_files = {
+                "train_redacted.jsonl": "https://zenodo.org/records/15114172/files/train_redacted.jsonl?download=1",
+                "dev_redacted.jsonl": "https://zenodo.org/records/15114172/files/dev_redacted.jsonl?download=1"
+            }
+            for filename, url in zenodo_files.items():
+                filepath = raw_path / filename
+                if not filepath.exists():
+                    logger.info(f"downloading {filename} from Zenodo to {filepath}")
+                    try:
+                        res = requests.get(url)
+                        if res.status_code == 200:
+                            with open(filepath, 'wb') as f:
+                                f.write(res.content)
+                            logger.success(f"{filename} downloaded successfully from Zenodo")
+                        else:
+                            logger.warning(f"Zenodo responded with status code {res.status_code} for {filename}")
+                    except Exception as e:
+                        logger.warning(f"failed to contact Zenodo for {filename}: {e}")
+            # checking if the required files are present in the raw_dir
+            required_files = ["train_redacted.jsonl", "dev_redacted.jsonl"]
+            missing_files = [f for f in required_files if not (raw_path / f).exists()]
+            # if any required files are missing, log an error and provide instructions for manual download
+            if missing_files:
+                logger.error(
+                    f"not possible to download all required files automatically.\n"
+                    f"missing files: {missing_files}\n"
+                    f"go to Zenodo: https://zenodo.org/doi/10.5281/zenodo.15114172\n"
+                    f"download the missing files manually\n"
+                    f"place them in the folder: {os.path.abspath(raw_path)} and rerun the script\n"
+                )
+                return
+            # checking if the rehydration script exists and executing it
+            if script_path.exists():
+                logger.info("executing rehydration script")
+                try:
+                    subprocess.run(["python", "rehydrate_data.py"], cwd=self.raw_dir, check=True)
+                    logger.success("rehydration of SemEval completed successfully")
+                except subprocess.CalledProcessError as e:
+                    logger.error(f"error occurred while executing the rehydration script: {e}")
 
     def check_readiness(self) -> bool:
         raw_path = Path(self.raw_dir)

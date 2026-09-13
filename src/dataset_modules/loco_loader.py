@@ -1,7 +1,10 @@
 import json
+import os
 import random
+from loguru import logger
 from pathlib import Path
 from typing import Generator, Dict, Any
+import requests
 from .base_loader import BaseDatasetLoader
 from . import register_loader
 
@@ -13,7 +16,31 @@ class LocoLoader(BaseDatasetLoader):
     }
 
     def acquire(self) -> None:
-        pass
+        # files to download from the OSF repository
+        files_to_download = {
+            "LOCO.json": "https://osf.io/qfjc4", 
+            "topic_description.json": "https://osf.io/ksrcx"
+        }
+        # create the data directory if it doesn't exist
+        data_dir = os.path.join(self.raw_dir, "data")
+        os.makedirs(data_dir, exist_ok=True)
+        # iterate over the files to download
+        for filename, url in files_to_download.items():
+            filepath = os.path.join(data_dir, filename)
+            if not self.check_readiness(): 
+                # check if the file already exists, if not download it
+                if not os.path.exists(filepath):
+                    logger.info(f"downloading {filename} from {url} to {filepath}")
+                    response = requests.get(url)
+                    # check if the request was successful
+                    if response.status_code == 200:
+                        with open(filepath, 'wb') as f:
+                            f.write(response.content)
+                        logger.success(f"completed downloading {filepath}")
+                    else:
+                        logger.error(f"error {response.status_code} occurred while downloading {filename}.")
+                else:
+                    logger.info(f"{filename} already exists in {data_dir}, skipping download")
 
     def check_readiness(self) -> bool:
         p = Path(self.raw_dir)

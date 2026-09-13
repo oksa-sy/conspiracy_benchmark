@@ -1,10 +1,14 @@
+import os
+from loguru import logger
 import pandas as pd
 from pathlib import Path
 from typing import Generator, Dict, Any
+import requests
 from .base_loader import BaseDatasetLoader
 from . import register_loader
 
 @register_loader("voat")
+
 class VoatLoader(BaseDatasetLoader):
     label_mapping = {
         1: "conspiracy", 
@@ -12,7 +16,27 @@ class VoatLoader(BaseDatasetLoader):
     }
 
     def acquire(self) -> None:
-        pass
+        # method to acquire the dataset, in this case it will download the dataset from a given URL and save it to the raw_dir
+        url = "https://raw.githubusercontent.com/nika-akin/LLMs-and-conspiracy-beliefs/main/data/voat_annotation.csv"
+        data_dir = os.path.join(self.raw_dir, "data")
+        os.makedirs(data_dir, exist_ok=True)
+        # extract the original filename from the URL
+        filename = url.split('/')[-1]
+        # define the filepath where the file will be saved
+        filepath = os.path.join(data_dir, filename)
+        # check if the file already exists, if not download it
+        if not os.path.exists(filepath):
+            logger.info(f"downloading {filename} from {url} to {filepath}")
+            response = requests.get(url)
+            # check if the request was successful
+            if response.status_code == 200:
+                with open(filepath, 'wb') as f:
+                    f.write(response.content)
+                logger.success(f"completed downloading {filepath}")
+            else:
+                logger.error(f"error {response.status_code} occurred while downloading from the repository.")
+        else:
+            logger.info(f"{filename} already exists in {self.raw_dir}, skipping download")
 
     def check_readiness(self) -> bool:
         return (Path(self.raw_dir) / "data/voat_annotation.csv").exists()

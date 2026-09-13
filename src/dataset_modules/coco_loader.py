@@ -1,5 +1,7 @@
+import os
 from pathlib import Path
 from typing import Generator, Dict, Any
+from loguru import logger
 from .base_loader import BaseDatasetLoader
 from . import register_loader
 
@@ -20,7 +22,18 @@ class CocoLoader(BaseDatasetLoader):
     ]
 
     def acquire(self) -> None:
-        pass
+        if self.check_readiness():
+            logger.info("COCO dataset already present, skipping acquisition.")
+            return
+        # create the raw directory if it doesn't exist
+        raw_path = Path(self.raw_dir)
+        os.makedirs(raw_path, exist_ok=True)
+        logger.error(
+            f"COCO is a licensed dataset (EU Digital Services Act, Art. 40)\n"
+            f"all the instructions are available at: https://huggingface.co/datasets/Jlangguth/COCO\n"
+            f"after approval, place the received files in: {os.path.abspath(raw_path)}\n"
+            f"then rerun the script\n"
+        )
 
     def check_readiness(self) -> bool:
         return (Path(self.raw_dir) / "COCO_export").exists()
