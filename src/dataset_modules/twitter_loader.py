@@ -24,7 +24,7 @@ class TwitterConspiracyLoader(BaseDatasetLoader):
 
     def acquire(self) -> None:
         if self.check_readiness():
-            logger.info("Twitter Conspiracy dataset already present, skipping acquisition.")
+            logger.info("Twitter Conspiracy dataset already present, skipping acquisition")
             return
         # create the raw directory if it doesn't exist
         raw_path = Path(self.raw_dir)
@@ -33,7 +33,7 @@ class TwitterConspiracyLoader(BaseDatasetLoader):
             f"a formal request is required to obtain the Twitter Conspiracy dataset\n"
             f"contact the authors of the paper (e.g., Veronika Batzdorfer: Veronika.Batzdorfer@gesis.org)\n"
             f"place the received files in the folder: {os.path.abspath(raw_path)}\n"
-            f"then rerun the script.\n"
+            f"then rerun the script\n"
         )
 
     def check_readiness(self) -> bool:

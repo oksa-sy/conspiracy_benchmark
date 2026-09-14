@@ -34,7 +34,7 @@ class VoatLoader(BaseDatasetLoader):
                     f.write(response.content)
                 logger.success(f"completed downloading {filepath}")
             else:
-                logger.error(f"error {response.status_code} occurred while downloading from the repository.")
+                logger.error(f"error {response.status_code} occurred while downloading from the repository")
         else:
             logger.info(f"{filename} already exists in {self.raw_dir}, skipping download")
 

@@ -18,7 +18,7 @@ app = typer.Typer()
 def rehydrate(datasets: str = typer.Option(..., "--datasets", help="name of the dataset to rehydrate")):
     # check if the dataset is registered in the LOADER_REGISTRY
     if datasets not in LOADER_REGISTRY:
-        logger.error(f"dataset '{datasets}' not registered.")
+        logger.error(f"dataset '{datasets}' not registered")
         raise typer.Exit(code=1)
     # define the raw directory path for the dataset
     logger.info(f"starting rehydration for dataset: {datasets}")
@@ -32,7 +32,7 @@ def rehydrate(datasets: str = typer.Option(..., "--datasets", help="name of the 
     if loader.check_readiness():
         logger.success(f"[{datasets}] rehydration completed successfully.")
     else:
-        logger.error(f"[{datasets}] rehydration failed.")
+        logger.error(f"[{datasets}] rehydration failed")
 
 if __name__ == "__main__":
     app()

@@ -23,7 +23,7 @@ class CocoLoader(BaseDatasetLoader):
 
     def acquire(self) -> None:
         if self.check_readiness():
-            logger.info("COCO dataset already present, skipping acquisition.")
+            logger.info("COCO dataset already present, skipping acquisition")
             return
         # create the raw directory if it doesn't exist
         raw_path = Path(self.raw_dir)
